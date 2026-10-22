@@ -205,7 +205,11 @@ fun DeckCard(
             }
 
             IconButton(onClick = onPlay) {
-                Icon(Icons.Default.PlayArrow, contentDescription = "Review ${deck.name}")
+                Icon(
+                    Icons.Default.PlayArrow,
+                    contentDescription = "Review ${deck.name}",
+                    tint = MaterialTheme.colorScheme.secondary
+                )
             }
         }
     }
