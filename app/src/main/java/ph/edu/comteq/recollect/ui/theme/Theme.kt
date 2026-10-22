@@ -1,36 +1,63 @@
 package ph.edu.comteq.recollect.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-private val RecollectColors = lightColorScheme(
-    primary = DeepTeal,
-    onPrimary = Color.White,
-    primaryContainer = TealTint,
-    onPrimaryContainer = Ink,
-    secondary = AccentOrange,
-    onSecondary = Color(0xFF2B1200),
-    tertiary = BrandTeal,
-    onTertiary = Color(0xFF04292E),
-    background = Paper,
-    onBackground = Ink,
-    surface = Paper,
-    onSurface = Ink,
-    surfaceVariant = TealTint,
-    onSurfaceVariant = Color(0xFF2E5258),
-    surfaceContainerHighest = TealTint   // the default color of Card
+private val LightColors = lightColorScheme(
+    primary = LightPrimary,
+    onPrimary = LightOnPrimary,
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = LightOnPrimaryContainer,
+    secondary = LightSecondary,
+    onSecondary = LightOnSecondary,
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
+    background = LightBackground,
+    onBackground = LightOnBackground,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    surfaceContainerHighest = LightSurfaceContainerHighest
+)
+
+private val DarkColors = darkColorScheme(
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    surfaceContainerHighest = DarkSurfaceContainerHighest
 )
 
 @Composable
-fun ReCollectTheme(content: @Composable () -> Unit) {
+fun ReCollectTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColors else LightColors
+
     MaterialTheme(
-        colorScheme = RecollectColors,
+        colorScheme = colorScheme,
         typography = Typography,
         content = content
     )
 }
 
 @Composable
-fun RecollectTheme(content: @Composable () -> Unit) = ReCollectTheme(content = content)
+fun RecollectTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) = ReCollectTheme(darkTheme = darkTheme, content = content)
