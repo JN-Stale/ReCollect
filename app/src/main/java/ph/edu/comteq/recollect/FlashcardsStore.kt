@@ -13,6 +13,22 @@ class FlashcardStore {
         cards.addAll(sampleCards)
     }
 
+    fun cardsOf(deckId: Int): List<Flashcard> {
+        return cards.filter { it.deckId == deckId }
+    }
+
+    // Saves one answer: bumps the right counter and stamps the time
+    fun recordAnswer(card: Flashcard, wasCorrect: Boolean) {
+        val index = cards.indexOfFirst { it.id == card.id }
+        if (index == -1) return                       // card was not found
+        val old = cards[index]                        // use the stored copy so counts add up
+        cards[index] = old.copy(
+            timesCorrect = if (wasCorrect) old.timesCorrect + 1 else old.timesCorrect,
+            timesIncorrect = if (wasCorrect) old.timesIncorrect else old.timesIncorrect + 1,
+            lastReviewedDate = System.currentTimeMillis()   // epoch milliseconds, as in your model
+        )
+    }
+
     fun addDeck(name: String) {
         // New id = highest existing id + 1 (or 1 if there are no decks yet)
         val newId = (decks.maxOfOrNull { it.id } ?: 0) + 1

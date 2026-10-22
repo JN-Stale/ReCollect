@@ -4,5 +4,6 @@ package ph.edu.comteq.recollect
 enum class Screen {
     DECK_LIST,
     DECK_DETAIL,
-    CARD_FORM
+    CARD_FORM,
+    REVIEW
 }

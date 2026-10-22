@@ -47,6 +47,7 @@ fun ReCollectApp() {
                         }
                         Screen.DECK_DETAIL -> Text(selectedDeck?.name ?: "")
                         Screen.CARD_FORM -> Text(if (editingCard == null) "Add card" else "Edit card")
+                        Screen.REVIEW -> Text(selectedDeck?.name ?: "Review")
                     }
                 },
                 navigationIcon = {
@@ -77,6 +78,10 @@ fun ReCollectApp() {
                 onDeckClick = { deck ->
                     selectedDeckId = deck.id
                     currentScreen = Screen.DECK_DETAIL
+                },
+                onPlayDeck = { deck ->
+                    selectedDeckId = deck.id
+                    currentScreen = Screen.REVIEW
                 }
             )
             Screen.DECK_DETAIL -> {
@@ -108,6 +113,16 @@ fun ReCollectApp() {
                             }
                             currentScreen = Screen.DECK_DETAIL    // back to the card list
                         },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+            Screen.REVIEW -> {
+                if (selectedDeck != null) {
+                    ReviewScreen(
+                        cards = store.cardsOf(selectedDeck.id),
+                        onAnswered = { card, correct -> store.recordAnswer(card, correct) },
+                        onFinished = { currentScreen = Screen.DECK_LIST },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

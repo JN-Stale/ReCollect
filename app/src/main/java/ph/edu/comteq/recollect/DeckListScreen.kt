@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 fun DeckListScreen(
     store: FlashcardStore,
     onDeckClick: (Deck) -> Unit,
+    onPlayDeck: (Deck) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var searchText by remember { mutableStateOf("") }
@@ -64,7 +65,7 @@ fun DeckListScreen(
                         deck = deck,
                         cardCount = store.cards.count { it.deckId == deck.id },
                         onClick = { onDeckClick(deck) },
-                        onPlay = { /* start a review of this deck */ },
+                        onPlay = { onPlayDeck(deck) },
                         onRename = { deckToRename = deck },   // remember WHICH deck, which opens the popup
                         onDelete = { deckToDelete = deck }
                     )
