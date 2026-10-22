@@ -6,6 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 // Case-insensitive, ignores spaces at the start and end
 fun isCorrectAnswer(typed: String, title: String): Boolean =
@@ -14,19 +16,29 @@ fun isCorrectAnswer(typed: String, title: String): Boolean =
 @Composable
 fun ReviewScreen(
     cards: List<Flashcard>,
-    onAnswered: (Flashcard, Boolean) -> Unit,   // tells the store the result
-    onFinished: () -> Unit,                      // leaves the screen
+    onAnswered: (Flashcard, Boolean) -> Unit,
+    onFinished: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sessionCards = remember { cards }       // fixed list for this session
-    var index by remember { mutableStateOf(0) }             // which card we are on
-    var typed by remember { mutableStateOf("") }            // what the user typed
-    var wasCorrect by remember { mutableStateOf<Boolean?>(null) }  // null = not checked yet
-    var score by remember { mutableStateOf(0) }
+    val sessionCards = remember { cards }
+    var index by remember { mutableIntStateOf(0) }
+    var typed by remember { mutableStateOf("") }
+    var wasCorrect by remember { mutableStateOf<Boolean?>(null) }
+    var score by remember { mutableIntStateOf(0) }
 
-    // One place decides when the session ends.
-    // Survival mode later becomes: index >= sessionCards.size || lives == 0
-    val sessionOver = index >= sessionCards.size
+    val card = sessionCards.getOrNull(index)
+    val position = index + 1   // calculated here so the LazyColumn never reads index
+
+    // after an answer is checked, wait, then move to the next card
+    LaunchedEffect(wasCorrect) {
+        val result = wasCorrect
+        if (result != null) {
+            delay(if (result) 1000.milliseconds else 2500.milliseconds)   // more time to read a wrong answer
+            index++
+            typed = ""
+            wasCorrect = null
+        }
+    }
 
     LazyColumn(
         modifier = modifier
@@ -36,15 +48,12 @@ fun ReviewScreen(
     ) {
         if (sessionCards.isEmpty()) {
             item { Text("This deck has no cards to review yet.") }
-            item { Button(onClick = onFinished) { Text("Back to decks") } }
-        } else if (sessionOver) {
+        } else if (card == null) {
             item { Text("Session finished", style = MaterialTheme.typography.headlineSmall) }
             item { Text("Score: $score of ${sessionCards.size}") }
             item { Button(onClick = onFinished) { Text("Back to decks") } }
         } else {
-            val card = sessionCards[index]
-            item { Text("Card ${index + 1} of ${sessionCards.size}") }
-            // No maxLines here, so the clue is never cut off
+            item { Text("Card $position of ${sessionCards.size}") }
             item { Text(card.description, style = MaterialTheme.typography.bodyLarge) }
             item {
                 OutlinedTextField(
@@ -52,7 +61,7 @@ fun ReviewScreen(
                     onValueChange = { typed = it },
                     label = { Text("Your answer") },
                     singleLine = true,
-                    enabled = wasCorrect == null,    // locked after checking
+                    enabled = wasCorrect == null,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -70,13 +79,12 @@ fun ReviewScreen(
             item {
                 Button(onClick = {
                     if (wasCorrect == null) {
-                        // First tap: check the answer
                         val correct = isCorrectAnswer(typed, card.title)
                         wasCorrect = correct
                         if (correct) score++
                         onAnswered(card, correct)
                     } else {
-                        // Second tap: go to the next card
+                        // Skip the wait. Changing wasCorrect cancels the LaunchedEffect.
                         index++
                         typed = ""
                         wasCorrect = null
