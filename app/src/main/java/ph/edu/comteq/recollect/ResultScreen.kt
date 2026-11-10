@@ -20,8 +20,11 @@ import kotlin.math.roundToInt
 @Composable
 fun ResultsScreen(result: SessionResult, onDone: () -> Unit) {
     // Percentage rounded to a whole number. Guard against dividing by zero.
-    val accuracy = if (result.answered == 0) 0
-    else (result.correct * 100.0 / result.answered).roundToInt()
+    val accuracy = if (result.answered == 0) {
+        0
+    } else {
+        (result.correct * 100.0 / result.answered).roundToInt()
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -39,8 +42,11 @@ fun ResultsScreen(result: SessionResult, onDone: () -> Unit) {
         if (result.survival) {
             item {
                 Text(
-                    text = if (result.livesLeft > 0) "You survived! Lives left: " + "❤\uFE0F".repeat(result.livesLeft)
-                    else "Out of lives!"
+                    text = if (result.livesLeft > 0) {
+                        "You survived! Lives left: " + "❤\uFE0F".repeat(result.livesLeft)
+                    } else {
+                        "Out of lives!"
+                    }
                 )
             }
         }

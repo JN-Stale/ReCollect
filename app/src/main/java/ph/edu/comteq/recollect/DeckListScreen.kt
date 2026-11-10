@@ -62,9 +62,7 @@ fun DeckListScreen(
             OutlinedTextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                placeholder = {
-                    Text("Search decks")
-                },
+                placeholder = { Text("Search decks") },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -86,8 +84,11 @@ fun DeckListScreen(
         // Empty state, or the list
         if (visibleDecks.isEmpty()) {
             Text(
-                text = if (store.decks.isEmpty()) "No decks yet. Tap the pencil to create your first deck."
-                else "No deck matches \"$searchText\".",
+                text = if (store.decks.isEmpty()) {
+                    "No decks yet. Tap the pencil to create your first deck."
+                } else {
+                    "No deck matches \"$searchText\"."
+                },
                 modifier = Modifier.padding(top = 24.dp)
             )
         } else {
@@ -98,7 +99,8 @@ fun DeckListScreen(
                         cardCount = store.cards.count { it.deckId == deck.id },
                         onClick = { onDeckClick(deck) },
                         onPlay = { onPlayDeck(deck) },
-                        onRename = { deckToRename = deck },   // remember WHICH deck, which opens the popup
+                        // remember WHICH deck, which opens the popup
+                        onRename = { deckToRename = deck },
                         onDelete = { deckToDelete = deck }
                     )
                 }
@@ -144,7 +146,8 @@ fun DeckListScreen(
 
     val renamingDeck = deckToRename
     if (renamingDeck != null) {
-        var newName by remember { mutableStateOf(renamingDeck.name) }   // starts with the current name
+        // starts with the current name
+        var newName by remember { mutableStateOf(renamingDeck.name) }
         AlertDialog(
             onDismissRequest = { deckToRename = null },
             title = {
@@ -219,7 +222,7 @@ fun DeckCard(
     onRename: () -> Unit,
     onDelete: () -> Unit
 ) {
-    var menuOpen by remember { mutableStateOf(false) }   // each card has its own menu state
+    var menuOpen by remember { mutableStateOf(false) } // each card has its own menu state
 
     Card(
         onClick = onClick,

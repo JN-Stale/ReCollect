@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,180 +28,201 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ph.edu.comteq.recollect.ui.theme.ReCollectTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReCollectApp() {
     val store = remember { FlashcardStore() }
 
+    // Theme state: light mode by default (false = light, true = dark)
+    var isDarkTheme by remember { mutableStateOf(false) }
+
     // State variable that decides which screen is shown
     var currentScreen by remember { mutableStateOf(Screen.DECK_LIST) }
     // Keep only the id of the tapped deck, then look up the current Deck from the store
     var selectedDeckId by remember { mutableStateOf<Int?>(null) }
-    val selectedDeck = store.decks.find { it.id == selectedDeckId }   // null if nothing matches
-    var modeDeck by remember { mutableStateOf<Deck?>(null) }          // deck waiting for a mode choice
-    var survivalMode by remember { mutableStateOf(false) }            // the chosen mode
+    val selectedDeck = store.decks.find { it.id == selectedDeckId } // null if nothing matches
+    var modeDeck by remember { mutableStateOf<Deck?>(null) } // deck waiting for a mode choice
+    var survivalMode by remember { mutableStateOf(false) } // the chosen mode
     // The id of the card being edited. null means we're adding a new card.
     var editingCardId by remember { mutableStateOf<Int?>(null) }
-    val editingCard = store.cards.find { it.id == editingCardId }     // null when adding
+    val editingCard = store.cards.find { it.id == editingCardId } // null when adding
     var sessionResult by remember { mutableStateOf<SessionResult?>(null) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    when (currentScreen) {
-                        Screen.DECK_LIST -> Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(id = R.drawable.appicon),
-                                contentDescription = "ReCollect logo",
-                                modifier = Modifier.size(56.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = "ReCollect",
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Screen.DECK_DETAIL -> Text(selectedDeck?.name ?: "")
-                        Screen.CARD_FORM -> Text(if (editingCard == null) "Add card" else "Edit card")
-                        Screen.REVIEW -> Text(selectedDeck?.name ?: "Review")
-                        Screen.RESULTS -> Text("Results")
-                    }
-                },
-                navigationIcon = {
-                    if (currentScreen != Screen.DECK_LIST) {
-                        IconButton(
-                            onClick = {
-                                currentScreen = if (currentScreen == Screen.CARD_FORM) Screen.DECK_DETAIL else Screen.DECK_LIST
+    ReCollectTheme(darkTheme = isDarkTheme) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        when (currentScreen) {
+                            Screen.DECK_LIST -> {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.appicon),
+                                        contentDescription = "ReCollect logo",
+                                        modifier = Modifier.size(56.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = "ReCollect",
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                            Screen.DECK_DETAIL -> Text(selectedDeck?.name ?: "")
+                            Screen.CARD_FORM -> Text(
+                                if (editingCard == null) "Add card" else "Edit card"
                             )
+                            Screen.REVIEW -> Text(selectedDeck?.name ?: "Review")
+                            Screen.RESULTS -> Text("Results")
                         }
-                    }
-                },
-                actions = {
-                    // Settings gear (visual only for now), home screen only
-                    if (currentScreen == Screen.DECK_LIST) {
-                        IconButton(onClick = { /* no settings screen yet */ }) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Settings"
-                            )
-                        }
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        // Show a different screen depending on currentScreen
-        when (currentScreen) {
-            Screen.DECK_LIST -> DeckListScreen(
-                store = store,
-                modifier = Modifier.padding(innerPadding),
-                onDeckClick = { deck ->
-                    selectedDeckId = deck.id
-                    currentScreen = Screen.DECK_DETAIL
-                },
-                onPlayDeck = { deck ->
-                    modeDeck = deck
-                }
-            )
-            Screen.DECK_DETAIL -> {
-                if (selectedDeck != null) {
-                    DeckDetailScreen(
-                        deck = selectedDeck,
-                        store = store,
-                        onAddCard = {
-                            editingCardId = null                  // null = adding
-                            currentScreen = Screen.CARD_FORM
-                        },
-                        onEditCard = { card ->
-                            editingCardId = card.id               // remember which card
-                            currentScreen = Screen.CARD_FORM
-                        },
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-            Screen.CARD_FORM -> {
-                if (selectedDeck != null) {
-                    CardFormScreen(
-                        card = editingCard,
-                        onSave = { title, description ->
-                            if (editingCard == null) {
-                                store.addCard(selectedDeck.id, title, description)
-                            } else {
-                                store.updateCard(editingCard.id, title, description)
+                    },
+                    navigationIcon = {
+                        if (currentScreen != Screen.DECK_LIST) {
+                            IconButton(
+                                onClick = {
+                                    currentScreen = if (currentScreen == Screen.CARD_FORM) {
+                                        Screen.DECK_DETAIL
+                                    } else {
+                                        Screen.DECK_LIST
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Back"
+                                )
                             }
-                            currentScreen = Screen.DECK_DETAIL    // back to the card list
-                        },
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                        }
+                    },
+                    actions = {
+                        if (currentScreen == Screen.DECK_LIST) {
+                            IconButton(onClick = { isDarkTheme = !isDarkTheme }) {
+                                Icon(
+                                    imageVector = if (isDarkTheme) {
+                                        Icons.Default.LightMode
+                                    } else {
+                                        Icons.Default.DarkMode
+                                    },
+                                    contentDescription = if (isDarkTheme) {
+                                        "Switch to light mode"
+                                    } else {
+                                        "Switch to dark mode"
+                                    }
+                                )
+                            }
+                        }
+                    }
+                )
             }
-            Screen.REVIEW -> {
-                if (selectedDeck != null) {
-                    ReviewScreen(
-                        cards = store.cardsOf(selectedDeck.id),
-                        survival = survivalMode,
-                        onAnswered = { card, correct -> store.recordAnswer(card, correct) },
-                        onFinished = { result ->
-                            sessionResult = result
-                            currentScreen = Screen.RESULTS
-                        },
-                        modifier = Modifier.padding(innerPadding)
-                    )
+        ) { innerPadding ->
+            // Show a different screen depending on currentScreen
+            when (currentScreen) {
+                Screen.DECK_LIST -> DeckListScreen(
+                    store = store,
+                    modifier = Modifier.padding(innerPadding),
+                    onDeckClick = { deck ->
+                        selectedDeckId = deck.id
+                        currentScreen = Screen.DECK_DETAIL
+                    },
+                    onPlayDeck = { deck ->
+                        modeDeck = deck
+                    }
+                )
+                Screen.DECK_DETAIL -> {
+                    if (selectedDeck != null) {
+                        DeckDetailScreen(
+                            deck = selectedDeck,
+                            store = store,
+                            onAddCard = {
+                                editingCardId = null // null = adding
+                                currentScreen = Screen.CARD_FORM
+                            },
+                            onEditCard = { card ->
+                                editingCardId = card.id // remember which card
+                                currentScreen = Screen.CARD_FORM
+                            },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
                 }
-            }
-            Screen.RESULTS -> {
-                sessionResult?.let { result ->
-                    ResultsScreen(
-                        result = result,
-                        onDone = { currentScreen = Screen.DECK_LIST }
-                    )
+                Screen.CARD_FORM -> {
+                    if (selectedDeck != null) {
+                        CardFormScreen(
+                            card = editingCard,
+                            onSave = { title, description ->
+                                if (editingCard == null) {
+                                    store.addCard(selectedDeck.id, title, description)
+                                } else {
+                                    store.updateCard(editingCard.id, title, description)
+                                }
+                                currentScreen = Screen.DECK_DETAIL // back to the card list
+                            },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                }
+                Screen.REVIEW -> {
+                    if (selectedDeck != null) {
+                        ReviewScreen(
+                            cards = store.cardsOf(selectedDeck.id),
+                            survival = survivalMode,
+                            onAnswered = { card, correct -> store.recordAnswer(card, correct) },
+                            onFinished = { result ->
+                                sessionResult = result
+                                currentScreen = Screen.RESULTS
+                            },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                }
+                Screen.RESULTS -> {
+                    sessionResult?.let { result ->
+                        ResultsScreen(
+                            result = result,
+                            onDone = { currentScreen = Screen.DECK_LIST }
+                        )
+                    }
                 }
             }
         }
-    }
 
-    // Mode selection dialog when a deck is chosen to review
-    modeDeck?.let { deck ->
-        AlertDialog(
-            onDismissRequest = { modeDeck = null },          // tap outside to cancel
-            title = {
-                Text("Start review")
-            },
-            text = {
-                Text("Survival gives you 3 lives and ends when they run out.")
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        selectedDeckId = deck.id
-                        survivalMode = true
-                        modeDeck = null
-                        currentScreen = Screen.REVIEW
+        // Mode selection dialog when a deck is chosen to review
+        modeDeck?.let { deck ->
+            AlertDialog(
+                onDismissRequest = { modeDeck = null },          // tap outside to cancel
+                title = {
+                    Text("Start review")
+                },
+                text = {
+                    Text("Survival gives you 3 lives and ends when they run out.")
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            selectedDeckId = deck.id
+                            survivalMode = true
+                            modeDeck = null
+                            currentScreen = Screen.REVIEW
+                        }
+                    ) {
+                        Text("Survival")
                     }
-                ) {
-                    Text("Survival")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        selectedDeckId = deck.id
-                        survivalMode = false
-                        modeDeck = null
-                        currentScreen = Screen.REVIEW
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            selectedDeckId = deck.id
+                            survivalMode = false
+                            modeDeck = null
+                            currentScreen = Screen.REVIEW
+                        }
+                    ) {
+                        Text("Normal")
                     }
-                ) {
-                    Text("Normal")
                 }
-            }
-        )
+            )
+        }
     }
 }

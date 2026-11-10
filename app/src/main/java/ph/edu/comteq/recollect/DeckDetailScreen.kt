@@ -106,7 +106,8 @@ fun CardRow(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                // No maxLines. the full clue is always shown, wrapping onto as many lines as it needs
+                // No maxLines. the full clue is always shown, wrapping onto as many lines as it
+                // needs
                 Text(
                     text = card.description,
                     style = MaterialTheme.typography.bodySmall

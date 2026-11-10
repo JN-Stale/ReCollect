@@ -20,12 +20,12 @@ class FlashcardStore {
     // Saves one answer: bumps the right counter and stamps the time
     fun recordAnswer(card: Flashcard, wasCorrect: Boolean) {
         val index = cards.indexOfFirst { it.id == card.id }
-        if (index == -1) return                       // card was not found
-        val old = cards[index]                        // use the stored copy so counts add up
+        if (index == -1) return // card was not found
+        val old = cards[index] // use the stored copy so counts add up
         cards[index] = old.copy(
             timesCorrect = if (wasCorrect) old.timesCorrect + 1 else old.timesCorrect,
             timesIncorrect = if (wasCorrect) old.timesIncorrect else old.timesIncorrect + 1,
-            lastReviewedDate = System.currentTimeMillis()   // epoch milliseconds, as in your model
+            lastReviewedDate = System.currentTimeMillis() // epoch milliseconds, as in your model
         )
     }
 
@@ -37,11 +37,12 @@ class FlashcardStore {
 
     fun deleteDeck(deckId: Int) {
         decks.removeAll { it.id == deckId }
-        cards.removeAll { it.deckId == deckId }   // deleting a deck also deletes its cards
+        cards.removeAll { it.deckId == deckId } // deleting a deck also deletes its cards
     }
 
     fun renameDeck(deckId: Int, newName: String) {
-        val index = decks.indexOfFirst { it.id == deckId }   // position in the list, or -1 if not found
+        val index = decks.indexOfFirst { it.id == deckId }
+        // position in the list, or -1 if not found
         if (index != -1) {
             // copy() makes a new Deck with only the name changed
             decks[index] = decks[index].copy(name = newName.trim())
@@ -55,7 +56,14 @@ class FlashcardStore {
     fun addCard(deckId: Int, title: String, description: String) {
         val newId = (cards.maxOfOrNull { it.id } ?: 0) + 1
         // timesCorrect, timesIncorrect and lastReviewedDate use their defaults (0, 0, null)
-        cards.add(Flashcard(id = newId, deckId = deckId, title = title.trim(), description = description.trim()))
+        cards.add(
+            Flashcard(
+                id = newId,
+                deckId = deckId,
+                title = title.trim(),
+                description = description.trim()
+            )
+        )
     }
 
     fun updateCard(cardId: Int, title: String, description: String) {

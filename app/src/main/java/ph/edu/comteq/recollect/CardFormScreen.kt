@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CardFormScreen(
-    card: Flashcard?,                                    // null = adding a new card, otherwise editing this one
+    card: Flashcard?, // null = adding a new card, otherwise editing this one
     onSave: (title: String, description: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -39,9 +39,7 @@ fun CardFormScreen(
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = {
-                Text("Title (the answer)")
-            },
+            label = { Text("Title (the answer)") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -51,9 +49,7 @@ fun CardFormScreen(
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
-            label = {
-                Text("Description (the clue)")
-            },
+            label = { Text("Description (the clue)") },
             minLines = 4,
             maxLines = 8,
             modifier = Modifier.fillMaxWidth()
@@ -63,7 +59,7 @@ fun CardFormScreen(
 
         Button(
             onClick = { onSave(title, description) },
-            enabled = title.isNotBlank() && description.isNotBlank(),   // no blank cards
+            enabled = title.isNotBlank() && description.isNotBlank(), // no blank cards
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(if (card == null) "Add card" else "Save changes")
