@@ -1,8 +1,19 @@
 package ph.edu.comteq.recollect
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -19,12 +30,18 @@ fun CardFormScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+            .padding(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp
+            )
     ) {
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("Title (the answer)") },
+            label = {
+                Text("Title (the answer)")
+            },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -34,7 +51,9 @@ fun CardFormScreen(
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
-            label = { Text("Description (the clue)") },
+            label = {
+                Text("Description (the clue)")
+            },
             minLines = 4,
             maxLines = 8,
             modifier = Modifier.fillMaxWidth()

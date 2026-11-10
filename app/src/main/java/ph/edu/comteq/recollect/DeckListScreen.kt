@@ -1,6 +1,11 @@
 package ph.edu.comteq.recollect
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,8 +13,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -33,21 +51,35 @@ fun DeckListScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(start = 16.dp, top = 16.dp, end = 16.dp)   // top = space under the top bar
+            .padding(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp
+            )   // top = space under the top bar
     ) {
         // Search bar + new-deck button
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                placeholder = { Text("Search decks") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                placeholder = {
+                    Text("Search decks")
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
+                    )
+                },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Edit, contentDescription = "New deck")
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "New deck"
+                )
             }
         }
 
@@ -79,7 +111,9 @@ fun DeckListScreen(
         var newDeckName by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
-            title = { Text("New deck") },
+            title = {
+                Text("New deck")
+            },
             text = {
                 OutlinedTextField(
                     value = newDeckName,
@@ -89,15 +123,21 @@ fun DeckListScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
-                    if (newDeckName.isNotBlank()) {
-                        store.addDeck(newDeckName)
-                        showAddDialog = false
+                TextButton(
+                    onClick = {
+                        if (newDeckName.isNotBlank()) {
+                            store.addDeck(newDeckName)
+                            showAddDialog = false
+                        }
                     }
-                }) { Text("Create") }
+                ) {
+                    Text("Create")
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showAddDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showAddDialog = false }) {
+                    Text("Cancel")
+                }
             }
         )
     }
@@ -107,7 +147,9 @@ fun DeckListScreen(
         var newName by remember { mutableStateOf(renamingDeck.name) }   // starts with the current name
         AlertDialog(
             onDismissRequest = { deckToRename = null },
-            title = { Text("Rename deck") },
+            title = {
+                Text("Rename deck")
+            },
             text = {
                 OutlinedTextField(
                     value = newName,
@@ -117,15 +159,21 @@ fun DeckListScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
-                    if (newName.isNotBlank()) {
-                        store.renameDeck(renamingDeck.id, newName)
-                        deckToRename = null
+                TextButton(
+                    onClick = {
+                        if (newName.isNotBlank()) {
+                            store.renameDeck(renamingDeck.id, newName)
+                            deckToRename = null
+                        }
                     }
-                }) { Text("Save") }
+                ) {
+                    Text("Save")
+                }
             },
             dismissButton = {
-                TextButton(onClick = { deckToRename = null }) { Text("Cancel") }
+                TextButton(onClick = { deckToRename = null }) {
+                    Text("Cancel")
+                }
             }
         )
     }
@@ -136,16 +184,26 @@ fun DeckListScreen(
         val cardCount = store.cards.count { it.deckId == deletingDeck.id }
         AlertDialog(
             onDismissRequest = { deckToDelete = null },
-            title = { Text("Delete deck?") },
-            text = { Text("\"${deletingDeck.name}\" and its $cardCount cards will be deleted.") },
+            title = {
+                Text("Delete deck?")
+            },
+            text = {
+                Text("\"${deletingDeck.name}\" and its $cardCount cards will be deleted.")
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    store.deleteDeck(deletingDeck.id)
-                    deckToDelete = null
-                }) { Text("Delete") }
+                TextButton(
+                    onClick = {
+                        store.deleteDeck(deletingDeck.id)
+                        deckToDelete = null
+                    }
+                ) {
+                    Text("Delete")
+                }
             },
             dismissButton = {
-                TextButton(onClick = { deckToDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { deckToDelete = null }) {
+                    Text("Cancel")
+                }
             }
         )
     }
@@ -171,18 +229,33 @@ fun DeckCard(
             .padding(vertical = 6.dp)
     ) {
         Row(
-            modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 16.dp, end = 8.dp),
+            modifier = Modifier.padding(
+                start = 20.dp,
+                top = 16.dp,
+                bottom = 16.dp,
+                end = 8.dp
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(deck.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("$cardCount cards", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = deck.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "$cardCount cards",
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             // The Box makes the menu appear right under the pen
             Box {
                 IconButton(onClick = { menuOpen = true }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Deck options")
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Deck options"
+                    )
                 }
                 DropdownMenu(
                     expanded = menuOpen,
@@ -207,7 +280,7 @@ fun DeckCard(
 
             IconButton(onClick = onPlay) {
                 Icon(
-                    Icons.Default.PlayArrow,
+                    imageVector = Icons.Default.PlayArrow,
                     contentDescription = "Review ${deck.name}",
                     tint = MaterialTheme.colorScheme.secondary
                 )
