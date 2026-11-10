@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,14 +33,16 @@ import androidx.compose.ui.unit.dp
 fun ReCollectApp() {
     val store = remember { FlashcardStore() }
 
-    // state variable that decides which screen is shown
+    // State variable that decides which screen is shown
     var currentScreen by remember { mutableStateOf(Screen.DECK_LIST) }
     // Keep only the id of the tapped deck, then look up the current Deck from the store
     var selectedDeckId by remember { mutableStateOf<Int?>(null) }
     val selectedDeck = store.decks.find { it.id == selectedDeckId }   // null if nothing matches
+    var modeDeck by remember { mutableStateOf<Deck?>(null) }          // deck waiting for a mode choice
+    var survivalMode by remember { mutableStateOf(false) }            // the chosen mode
     // The id of the card being edited. null means we're adding a new card.
     var editingCardId by remember { mutableStateOf<Int?>(null) }
-    val editingCard = store.cards.find { it.id == editingCardId }   // null when adding
+    val editingCard = store.cards.find { it.id == editingCardId }     // null when adding
     var sessionResult by remember { mutableStateOf<SessionResult?>(null) }
 
     Scaffold(
@@ -102,8 +106,7 @@ fun ReCollectApp() {
                     currentScreen = Screen.DECK_DETAIL
                 },
                 onPlayDeck = { deck ->
-                    selectedDeckId = deck.id
-                    currentScreen = Screen.REVIEW
+                    modeDeck = deck
                 }
             )
             Screen.DECK_DETAIL -> {
@@ -143,6 +146,7 @@ fun ReCollectApp() {
                 if (selectedDeck != null) {
                     ReviewScreen(
                         cards = store.cardsOf(selectedDeck.id),
+                        survival = survivalMode,
                         onAnswered = { card, correct -> store.recordAnswer(card, correct) },
                         onFinished = { result ->
                             sessionResult = result
@@ -161,5 +165,42 @@ fun ReCollectApp() {
                 }
             }
         }
+    }
+
+    // Mode selection dialog when a deck is chosen to review
+    modeDeck?.let { deck ->
+        AlertDialog(
+            onDismissRequest = { modeDeck = null },          // tap outside to cancel
+            title = {
+                Text("Start review")
+            },
+            text = {
+                Text("Survival gives you 3 lives and ends when they run out.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        selectedDeckId = deck.id
+                        survivalMode = true
+                        modeDeck = null
+                        currentScreen = Screen.REVIEW
+                    }
+                ) {
+                    Text("Survival")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        selectedDeckId = deck.id
+                        survivalMode = false
+                        modeDeck = null
+                        currentScreen = Screen.REVIEW
+                    }
+                ) {
+                    Text("Normal")
+                }
+            }
+        )
     }
 }

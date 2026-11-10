@@ -24,13 +24,27 @@ fun ResultsScreen(result: SessionResult, onDone: () -> Unit) {
     else (result.correct * 100.0 / result.answered).roundToInt()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Text("Session complete",
-                style = MaterialTheme.typography.headlineSmall)
+            Text(
+                text = "Session complete",
+                style = MaterialTheme.typography.headlineSmall
+            )
         }
+
+        if (result.survival) {
+            item {
+                Text(
+                    text = if (result.livesLeft > 0) "You survived! Lives left: " + "❤\uFE0F".repeat(result.livesLeft)
+                    else "Out of lives!"
+                )
+            }
+        }
+
         item {
             Text("Score: ${result.correct} of ${result.answered}")
         }
@@ -44,13 +58,19 @@ fun ResultsScreen(result: SessionResult, onDone: () -> Unit) {
             }
         } else {
             item {
-                Text("Missed cards", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = "Missed cards",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
             items(result.missed) { card ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(card.description) // full clue
-                        Text("Answer: ${card.title}", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Answer: ${card.title}",
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }

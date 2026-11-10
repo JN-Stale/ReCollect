@@ -21,5 +21,7 @@ data class Flashcard(
 data class SessionResult(
     val correct: Int,
     val answered: Int,
-    val missed: List<Flashcard>
+    val missed: List<Flashcard>,
+    val survival: Boolean = false,   // toggle for the survival or lives
+    val livesLeft: Int = 0           // lives remaining at the end
 )

@@ -24,9 +24,13 @@ import kotlinx.coroutines.delay
 fun isCorrectAnswer(typed: String, title: String): Boolean =
     typed.trim().equals(title.trim(), ignoreCase = true)
 
+// For lives
+const val STARTING_LIVES = 3
+
 @Composable
 fun ReviewScreen(
     cards: List<Flashcard>,
+    survival: Boolean, // true = Survival mode
     onAnswered: (Flashcard, Boolean) -> Unit,
     onFinished: (SessionResult) -> Unit,
     modifier: Modifier = Modifier
@@ -36,16 +40,20 @@ fun ReviewScreen(
     var typed by remember { mutableStateOf("") }
     var wasCorrect by remember { mutableStateOf<Boolean?>(null) }
     var score by remember { mutableStateOf(0) }
+    var lives by remember { mutableStateOf(STARTING_LIVES) }
     val missed = remember { mutableStateListOf<Flashcard>() }
 
-    val card = sessionCards.getOrNull(index)
+    // No card means the session is over. In Survival mode it also ends
+    // when lives hit 0, but only after the feedback is done (wasCorrect == null),
+    // so the player still sees the right answer for the last mistake.
+    val outOfLives = survival && lives == 0 && wasCorrect == null
+    val card = if (outOfLives) null else sessionCards.getOrNull(index)
     val position = index + 1
 
-    // When the last card is done, send the result
     val sessionOver = sessionCards.isNotEmpty() && card == null
     LaunchedEffect(sessionOver) {
         if (sessionOver) {
-            onFinished(SessionResult(score, index, missed.toList()))
+            onFinished(SessionResult(score, index, missed.toList(), survival, lives))
         }
     }
 
@@ -70,6 +78,11 @@ fun ReviewScreen(
                 Text("This deck has no cards to review yet.")
             }
         } else if (card != null) {
+            if (survival) {
+                item {
+                    Text("Lives: " + "❤\uFE0F".repeat(lives))
+                }
+            }
             item {
                 Text("Card $position of ${sessionCards.size}")
             }
@@ -111,7 +124,12 @@ fun ReviewScreen(
                         if (wasCorrect == null) {
                             val correct = isCorrectAnswer(typed, card.title)
                             wasCorrect = correct
-                            if (correct) score++ else missed.add(card)
+                            if (correct) {
+                                score++
+                            } else {
+                                missed.add(card)
+                                if (survival) lives--
+                            }
                             onAnswered(card, correct)
                         } else {
                             index++
