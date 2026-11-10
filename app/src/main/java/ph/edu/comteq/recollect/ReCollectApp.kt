@@ -9,8 +9,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -30,6 +39,7 @@ fun ReCollectApp() {
     // The id of the card being edited. null means we're adding a new card.
     var editingCardId by remember { mutableStateOf<Int?>(null) }
     val editingCard = store.cards.find { it.id == editingCardId }   // null when adding
+    var sessionResult by remember { mutableStateOf<SessionResult?>(null) }
 
     Scaffold(
         topBar = {
@@ -43,19 +53,28 @@ fun ReCollectApp() {
                                 modifier = Modifier.size(56.dp)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text("ReCollect", fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "ReCollect",
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                         Screen.DECK_DETAIL -> Text(selectedDeck?.name ?: "")
                         Screen.CARD_FORM -> Text(if (editingCard == null) "Add card" else "Edit card")
                         Screen.REVIEW -> Text(selectedDeck?.name ?: "Review")
+                        Screen.RESULTS -> Text("Results")
                     }
                 },
                 navigationIcon = {
                     if (currentScreen != Screen.DECK_LIST) {
-                        IconButton(onClick = {
-                            currentScreen = if (currentScreen == Screen.CARD_FORM) Screen.DECK_DETAIL else Screen.DECK_LIST
-                        }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        IconButton(
+                            onClick = {
+                                currentScreen = if (currentScreen == Screen.CARD_FORM) Screen.DECK_DETAIL else Screen.DECK_LIST
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
                         }
                     }
                 },
@@ -63,7 +82,10 @@ fun ReCollectApp() {
                     // Settings gear (visual only for now), home screen only
                     if (currentScreen == Screen.DECK_LIST) {
                         IconButton(onClick = { /* no settings screen yet */ }) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings"
+                            )
                         }
                     }
                 }
@@ -122,8 +144,19 @@ fun ReCollectApp() {
                     ReviewScreen(
                         cards = store.cardsOf(selectedDeck.id),
                         onAnswered = { card, correct -> store.recordAnswer(card, correct) },
-                        onFinished = { currentScreen = Screen.DECK_LIST },
+                        onFinished = { result ->
+                            sessionResult = result
+                            currentScreen = Screen.RESULTS
+                        },
                         modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+            Screen.RESULTS -> {
+                sessionResult?.let { result ->
+                    ResultsScreen(
+                        result = result,
+                        onDone = { currentScreen = Screen.DECK_LIST }
                     )
                 }
             }

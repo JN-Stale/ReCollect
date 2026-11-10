@@ -51,6 +51,7 @@ class FlashcardStore {
     fun deleteCard(cardId: Int) {
         cards.removeAll { it.id == cardId }
     }
+
     fun addCard(deckId: Int, title: String, description: String) {
         val newId = (cards.maxOfOrNull { it.id } ?: 0) + 1
         // timesCorrect, timesIncorrect and lastReviewedDate use their defaults (0, 0, null)

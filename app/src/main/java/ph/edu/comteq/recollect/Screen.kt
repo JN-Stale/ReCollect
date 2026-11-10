@@ -5,5 +5,6 @@ enum class Screen {
     DECK_LIST,
     DECK_DETAIL,
     CARD_FORM,
-    REVIEW
+    REVIEW,
+    RESULTS
 }

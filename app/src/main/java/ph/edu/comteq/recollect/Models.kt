@@ -16,3 +16,10 @@ data class Flashcard(
     val timesIncorrect: Int = 0,
     val lastReviewedDate: Long? = null  // null = never reviewed yet
 )
+
+// the Results screen needs.
+data class SessionResult(
+    val correct: Int,
+    val answered: Int,
+    val missed: List<Flashcard>
+)
