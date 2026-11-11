@@ -1,14 +1,34 @@
 package ph.edu.comteq.recollect
 
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+
 // deck means a container for cards or like a group
+@Entity(tableName = "decks")
 data class Deck(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0, // 0 means "not saved yet", Room fills in the real id
     val name: String
 )
 
 // flashcard: title = the answer, description = the clue.
+@Entity(
+    tableName = "flashcards",
+    foreignKeys = [
+        ForeignKey(
+            entity = Deck::class,
+            parentColumns = ["id"],
+            childColumns = ["deckId"],
+            onDelete = ForeignKey.CASCADE // deleting a deck deletes its cards
+        )
+    ],
+    indices = [Index("deckId")]
+)
 data class Flashcard(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val deckId: Int, // which deck this card belongs to
     val title: String,
     val description: String,
