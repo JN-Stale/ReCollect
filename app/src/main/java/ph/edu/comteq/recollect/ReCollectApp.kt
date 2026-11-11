@@ -124,13 +124,12 @@ fun ReCollectApp() {
                                         "Switch to dark mode"
                                     }
                                 )
-
-                                IconButton(onClick = { currentScreen = Screen.ABOUT }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Info,
-                                        contentDescription = "About ReCollect"
-                                    )
-                                }
+                            }
+                            IconButton(onClick = { currentScreen = Screen.ABOUT }) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = "About ReCollect"
+                                )
                             }
                         }
                     }
