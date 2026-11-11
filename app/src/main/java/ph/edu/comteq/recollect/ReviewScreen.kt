@@ -9,6 +9,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -71,7 +73,8 @@ fun ReviewScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (sessionCards.isEmpty()) {
             item {
@@ -89,7 +92,8 @@ fun ReviewScreen(
             item {
                 Text(
                     text = card.description,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
                 )
             }
             item {
@@ -102,21 +106,20 @@ fun ReviewScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            if (wasCorrect == true) {
-                item {
-                    Text(
-                        text = "Correct!",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            if (wasCorrect == false) {
-                item {
-                    Text(
-                        text = "Incorrect. The answer is: ${card.title}",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
+            item {
+                Text(
+                    text = when (wasCorrect) {
+                        true -> "Correct!"
+                        false -> "Incorrect. The answer is: ${card.title}"
+                        null -> " " // keeps the space so nothing jumps
+                    },
+                    color = if (wasCorrect == false) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
+                    textAlign = TextAlign.Center
+                )
             }
             item {
                 Button(

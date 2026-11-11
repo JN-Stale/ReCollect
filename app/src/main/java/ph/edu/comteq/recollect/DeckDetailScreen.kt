@@ -22,6 +22,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +41,7 @@ fun DeckDetailScreen(
     onEditCard: (Flashcard) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var cardToDelete by remember { mutableStateOf<Flashcard?>(null) }
     val cards by store.cards.collectAsStateWithLifecycle()
 
     // Only the cards that belong to this deck
@@ -74,11 +80,40 @@ fun DeckDetailScreen(
                     CardRow(
                         card = card,
                         onEdit = { onEditCard(card) },
-                        onDelete = { store.deleteCard(card.id) }
+                        onDelete = { cardToDelete = card }
                     )
                 }
             }
         }
+    }
+
+    // Delete confirmation for a single card
+    val deletingCard = cardToDelete
+    if (deletingCard != null) {
+        AlertDialog(
+            onDismissRequest = { cardToDelete = null },
+            title = {
+                Text("Delete card?")
+            },
+            text = {
+                Text("\"${deletingCard.title}\" will be deleted.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        store.deleteCard(deletingCard.id)
+                        cardToDelete = null
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { cardToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
