@@ -1,5 +1,6 @@
 package ph.edu.comteq.recollect
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,6 +56,20 @@ fun ReCollectApp() {
     val editingCard = cards.find { it.id == editingCardId } // null when adding
     var sessionResult by remember { mutableStateOf<SessionResult?>(null) }
 
+    // used by the top bar arrow and the phone's Back button
+    fun goBack() {
+        currentScreen = if (currentScreen == Screen.CARD_FORM) {
+            Screen.DECK_DETAIL
+        } else {
+            Screen.DECK_LIST
+        }
+    }
+
+    // The phone's Back button or swipe. Off on the Deck List so Back closes the app there.
+    BackHandler(enabled = currentScreen != Screen.DECK_LIST) {
+        goBack()
+    }
+
     ReCollectTheme(darkTheme = isDarkTheme) {
         Scaffold(
             topBar = {
@@ -86,15 +101,7 @@ fun ReCollectApp() {
                     },
                     navigationIcon = {
                         if (currentScreen != Screen.DECK_LIST) {
-                            IconButton(
-                                onClick = {
-                                    currentScreen = if (currentScreen == Screen.CARD_FORM) {
-                                        Screen.DECK_DETAIL
-                                    } else {
-                                        Screen.DECK_LIST
-                                    }
-                                }
-                            ) {
+                            IconButton(onClick = { goBack() }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Back"
