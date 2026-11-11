@@ -18,7 +18,11 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
 @Composable
-fun ResultsScreen(result: SessionResult, onDone: () -> Unit) {
+fun ResultsScreen(
+    result: SessionResult,
+    onDone: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     // Percentage rounded to a whole number. Guard against dividing by zero.
     val accuracy = if (result.answered == 0) {
         0
@@ -27,7 +31,7 @@ fun ResultsScreen(result: SessionResult, onDone: () -> Unit) {
     }
 
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)

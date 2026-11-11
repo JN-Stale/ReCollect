@@ -194,7 +194,8 @@ fun ReCollectApp() {
                     sessionResult?.let { result ->
                         ResultsScreen(
                             result = result,
-                            onDone = { currentScreen = Screen.DECK_LIST }
+                            onDone = { currentScreen = Screen.DECK_LIST },
+                            modifier = Modifier.padding(innerPadding)
                         )
                     }
                 }
