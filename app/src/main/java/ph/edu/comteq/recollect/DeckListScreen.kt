@@ -31,23 +31,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun DeckListScreen(
-    store: FlashcardStore,
+    store: FlashcardViewModel,
     onDeckClick: (Deck) -> Unit,
     onPlayDeck: (Deck) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val decks by store.decks.collectAsStateWithLifecycle()
+    val cards by store.cards.collectAsStateWithLifecycle()
+
     var searchText by remember { mutableStateOf("") }
     var showAddDialog by remember { mutableStateOf(false) }
     // Which deck a popup is about. null means that popup is hidden.
     var deckToRename by remember { mutableStateOf<Deck?>(null) }
     var deckToDelete by remember { mutableStateOf<Deck?>(null) }
 
-    val visibleDecks = store.decks.filter { it.name.contains(searchText, ignoreCase = true) }
+    val visibleDecks = decks.filter { it.name.contains(searchText, ignoreCase = true) }
 
     Column(
         modifier = modifier
@@ -85,7 +89,7 @@ fun DeckListScreen(
         // Empty state, or the list
         if (visibleDecks.isEmpty()) {
             Text(
-                text = if (store.decks.isEmpty()) {
+                text = if (decks.isEmpty()) {
                     "No decks yet. Tap the pencil to create your first deck."
                 } else {
                     "No deck matches \"$searchText\"."
@@ -97,7 +101,7 @@ fun DeckListScreen(
                 items(visibleDecks) { deck ->
                     DeckCard(
                         deck = deck,
-                        cardCount = store.cards.count { it.deckId == deck.id },
+                        cardCount = cards.count { it.deckId == deck.id },
                         onClick = { onDeckClick(deck) },
                         onPlay = { onPlayDeck(deck) },
                         // remember WHICH deck, which opens the popup
@@ -185,7 +189,7 @@ fun DeckListScreen(
     // Delete confirmation. Deleting a deck also deletes its cards, so we ask first.
     val deletingDeck = deckToDelete
     if (deletingDeck != null) {
-        val cardCount = store.cards.count { it.deckId == deletingDeck.id }
+        val cardCount = cards.count { it.deckId == deletingDeck.id }
         AlertDialog(
             onDismissRequest = { deckToDelete = null },
             title = {

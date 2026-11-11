@@ -20,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,13 +31,15 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DeckDetailScreen(
     deck: Deck,
-    store: FlashcardStore,
+    store: FlashcardViewModel,
     onAddCard: () -> Unit,
     onEditCard: (Flashcard) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cards by store.cards.collectAsStateWithLifecycle()
+
     // Only the cards that belong to this deck
-    val deckCards = store.cards.filter { it.deckId == deck.id }
+    val deckCards = cards.filter { it.deckId == deck.id }
 
     Column(
         modifier = modifier

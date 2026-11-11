@@ -18,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +35,9 @@ import ph.edu.comteq.recollect.ui.theme.ReCollectTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReCollectApp() {
-    val store = remember { FlashcardStore() }
+    val store: FlashcardViewModel = viewModel()
+    val decks by store.decks.collectAsStateWithLifecycle()
+    val cards by store.cards.collectAsStateWithLifecycle()
 
     // Theme state: light mode by default (false = light, true = dark)
     var isDarkTheme by remember { mutableStateOf(false) }
@@ -42,12 +46,12 @@ fun ReCollectApp() {
     var currentScreen by remember { mutableStateOf(Screen.DECK_LIST) }
     // Keep only the id of the tapped deck, then look up the current Deck from the store
     var selectedDeckId by remember { mutableStateOf<Int?>(null) }
-    val selectedDeck = store.decks.find { it.id == selectedDeckId } // null if nothing matches
+    val selectedDeck = decks.find { it.id == selectedDeckId } // null if nothing matches
     var modeDeck by remember { mutableStateOf<Deck?>(null) } // deck waiting for a mode choice
     var survivalMode by remember { mutableStateOf(false) } // the chosen mode
     // The id of the card being edited. null means we're adding a new card.
     var editingCardId by remember { mutableStateOf<Int?>(null) }
-    val editingCard = store.cards.find { it.id == editingCardId } // null when adding
+    val editingCard = cards.find { it.id == editingCardId } // null when adding
     var sessionResult by remember { mutableStateOf<SessionResult?>(null) }
 
     ReCollectTheme(darkTheme = isDarkTheme) {
