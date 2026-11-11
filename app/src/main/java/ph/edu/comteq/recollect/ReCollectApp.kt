@@ -20,6 +20,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,6 +81,7 @@ fun ReCollectApp() {
                             )
                             Screen.REVIEW -> Text(selectedDeck?.name ?: "Review")
                             Screen.RESULTS -> Text("Results")
+                            Screen.ABOUT -> Text("About")
                         }
                     },
                     navigationIcon = {
@@ -115,6 +117,13 @@ fun ReCollectApp() {
                                         "Switch to dark mode"
                                     }
                                 )
+
+                                IconButton(onClick = { currentScreen = Screen.ABOUT }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "About ReCollect"
+                                    )
+                                }
                             }
                         }
                     }
@@ -189,6 +198,10 @@ fun ReCollectApp() {
                         )
                     }
                 }
+
+                Screen.ABOUT -> AboutScreen(
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
         }
 
