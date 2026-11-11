@@ -11,6 +11,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
+import kotlin.random.Random
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +27,22 @@ import kotlinx.coroutines.delay
 fun isCorrectAnswer(typed: String, title: String): Boolean =
     typed.trim().equals(title.trim(), ignoreCase = true)
 
+// How often a card should come up. New cards start at 3, each miss adds 2,
+// each correct answer takes away 1, and the weight never drops below 1.
+fun reviewWeight(card: Flashcard): Int {
+    return maxOf(1, 3 + 2 * card.timesIncorrect - card.timesCorrect)
+}
+
+// Random order, but cards with a bigger weight tend to come first.
+// Score is weight x a random number between 0 and 1. Highest score goes first.
+fun weightedOrder(cards: List<Flashcard>): List<Flashcard> {
+    // One random score per card, worked out once before sorting
+    val scores = cards.associateWith { card ->
+        reviewWeight(card) * Random.nextDouble()
+    }
+    return cards.sortedByDescending { card -> scores.getValue(card) }
+}
+
 // For lives
 const val STARTING_LIVES = 3
 
@@ -37,7 +54,7 @@ fun ReviewScreen(
     onFinished: (SessionResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sessionCards = remember { cards.shuffled() }   // new random order each session
+    val sessionCards = remember { weightedOrder(cards) }   // random order each session
     var index by remember { mutableStateOf(0) }
     var typed by remember { mutableStateOf("") }
     var wasCorrect by remember { mutableStateOf<Boolean?>(null) }
