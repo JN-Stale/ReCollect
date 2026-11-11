@@ -35,7 +35,7 @@ fun ReviewScreen(
     onFinished: (SessionResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sessionCards = remember { cards }
+    val sessionCards = remember { cards.shuffled() }   // new random order each session
     var index by remember { mutableStateOf(0) }
     var typed by remember { mutableStateOf("") }
     var wasCorrect by remember { mutableStateOf<Boolean?>(null) }
