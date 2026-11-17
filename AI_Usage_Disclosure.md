@@ -28,16 +28,16 @@ I started building ReCollect on my own. After that, I asked Claude for help, and
 
 - Provided code suggestions, alternatives, and bug fixes:
   1. The sample data
-  2. Suggested in-memory store
+  2. Suggested in-memory store at the beginning before learning about DAO
   3. Navigation fixes
-  4. Deck Detail screen initial layout
+  4. Deck Detail screen initial layout to match my wireframe better
 
 - Provided code alternatives and explanations to restyle the home screen to my wireframe
 - Explained concepts and syntax when I asked, and suggested alternative features when I was looking for ideas
 
 ## How AI assistance influenced my solution
 
-The ai helped in the debugging and initial look of the app so far, including how the screens are split, how the in-memory store is organized, and how navigation is handled. I used the AI's code as a reference to learn from, and I am working through it so that I can explain every part of it.
+The ai helped in the debugging and initial look of the app so far, including how the initial layout looked, how the DAO is organized, and how navigation is handled. I used the AI's code as a reference to learn from, and I am working through it so that I can explain every part of it.
 
 ## Verification steps
 
@@ -49,7 +49,7 @@ The ai helped in the debugging and initial look of the app so far, including how
 
 The prompts I used and the responses in summary are:
 
-- Helping to fic the navigation bugs.
+- Helping to fix the navigation bugs and layout problems.
 - Planning out the step by step of the development i should take to reduce the encounter of errors.
-- Vode alternative suggestions and explainations why theyre good.
-- Help matching the home screen to my wireframe
+- Code alternative suggestions and explainations why theyre good.
+- Help matching the home screen to my initial wireframe
